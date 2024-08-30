@@ -74,9 +74,9 @@ SHOW DATABASES;
 
 You should see ecom listed in the output.
 
-2. Run the Migration Again:
+2. Run the Migration:
 
-    Now that the ecom database exists, try running the make migrate-up command again:
+    Now that the ecom database exists, try running the make migrate-up command:
 
 ```bash
 make migrate-up
