@@ -14,7 +14,7 @@ func TestUserServiceHandlers(t *testing.T) {
 	handler := NewHandler(userStore)
 
 	t.Run("should fail if the user ID is not a number", func(t *testing.T) {
-		req, err := http.NewRequest(http.MethodGet, "/user/1", nil)
+		req, err := http.NewRequest(http.MethodGet, "/user/abcd", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
