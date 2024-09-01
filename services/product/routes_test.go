@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/sikozonpc/ecom/types"
+	"github.com/surfiniaburger/api-go/types"
 )
 
 func TestProductServiceHandlers(t *testing.T) {

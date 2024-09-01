@@ -1,4 +1,5 @@
-module github.com/sikozonpc/ecom
+module github.com/surfiniaburger/api-go
+
 
 go 1.22.0
 

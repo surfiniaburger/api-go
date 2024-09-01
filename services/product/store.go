@@ -1,3 +1,4 @@
+// product/store.go
 package product
 
 import (
@@ -5,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sikozonpc/ecom/types"
+	"github.com/surfiniaburger/api-go/types"
 )
 
 type Store struct {

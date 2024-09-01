@@ -1,3 +1,4 @@
+// user/routes.go
 package user
 
 import (
@@ -7,10 +8,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
-	"github.com/sikozonpc/ecom/configs"
-	"github.com/sikozonpc/ecom/services/auth"
-	"github.com/sikozonpc/ecom/types"
-	"github.com/sikozonpc/ecom/utils"
+	"github.com/surfiniaburger/api-go/configs"
+	"github.com/surfiniaburger/api-go/services/auth"
+	"github.com/surfiniaburger/api-go/types"
+	"github.com/surfiniaburger/api-go/utils"
 )
 
 type Handler struct {
@@ -90,11 +91,17 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Set default role if not provided
+	if user.Role == "" {
+		user.Role = "user"
+	}
+
 	err = h.store.CreateUser(types.User{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
 		Password:  hashedPassword,
+		Role:      user.Role,
 	})
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
