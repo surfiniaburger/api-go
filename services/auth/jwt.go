@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/sikozonpc/ecom/configs"
-	"github.com/sikozonpc/ecom/types"
-	"github.com/sikozonpc/ecom/utils"
+	"github.com/surfiniaburger/api-go/configs"
+	"github.com/surfiniaburger/api-go/types"
+	"github.com/surfiniaburger/api-go/utils"
 )
 
 type contextKey string

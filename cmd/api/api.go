@@ -1,3 +1,4 @@
+// api.go
 package api
 
 import (
@@ -6,10 +7,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/sikozonpc/ecom/services/cart"
-	"github.com/sikozonpc/ecom/services/order"
-	"github.com/sikozonpc/ecom/services/product"
-	"github.com/sikozonpc/ecom/services/user"
+	"github.com/surfiniaburger/api-go/services/cart"
+	"github.com/surfiniaburger/api-go/services/order"
+	"github.com/surfiniaburger/api-go/services/product"
+	"github.com/surfiniaburger/api-go/services/user"
 )
 
 type APIServer struct {

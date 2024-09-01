@@ -1,10 +1,11 @@
+// user/store.go
 package user
 
 import (
 	"database/sql"
 	"fmt"
 
-	"github.com/sikozonpc/ecom/types"
+	"github.com/surfiniaburger/api-go/types"
 )
 
 type Store struct {
@@ -16,7 +17,13 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) CreateUser(user types.User) error {
-	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password) VALUES (?, ?, ?, ?)", user.FirstName, user.LastName, user.Email, user.Password)
+
+	// Ensure the role is either 'user' or 'admin'
+	if user.Role != "user" && user.Role != "admin" {
+		return fmt.Errorf("invalid role: %s", user.Role)
+	}
+
+	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password, role) VALUES (?, ?, ?, ?, ?)", user.FirstName, user.LastName, user.Email, user.Password, user.Role)
 	if err != nil {
 		return err
 	}

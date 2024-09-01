@@ -6,13 +6,13 @@ import (
 	"log"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/sikozonpc/ecom/cmd/api"
-	"github.com/sikozonpc/ecom/configs"
-	"github.com/sikozonpc/ecom/db"
+	"github.com/surfiniaburger/api-go/cmd/api"
+	"github.com/surfiniaburger/api-go/configs"
+	"github.com/surfiniaburger/api-go/db"
 )
 
 func main() {
-		cfg := mysql.Config{
+	cfg := mysql.Config{
 		User:                 configs.Envs.DBUser,
 		Passwd:               configs.Envs.DBPassword,
 		Addr:                 configs.Envs.DBAddress,
