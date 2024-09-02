@@ -88,6 +88,167 @@ After that, you can run the project with the following command:
 make run
 ```
 
+## API Endpoints
+User Registration
+- Endpoint: POST /api/v1/register
+- Description: Registers a new user.
+- Payload Example:
+
+```bash
+{
+  "email": "jdmasciano2@gmail.com",
+  "password": "ogbono",
+  "firstName": "ade",
+  "lastName": "burger"
+}
+```
+
+Admin Registration: Include "role": "admin" in the payload.
+
+```bash
+
+    {
+      "email": "jd@gmail.com",
+      "password": "ogbono",
+      "firstName": "surfinia",
+      "lastName": "burg",
+      "role": "admin"
+    }
+```
+
+User Login
+
+- Endpoint: POST /api/v1/login
+
+- Description: Logs in a user and returns a JWT token.
+
+- Payload Example:
+
+
+```bash
+{
+  "email": "me@me.com",
+  "password": "asd"
+}
+```
+
+Response Example:
+
+```bash
+json
+
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzQXQiOjE3MjU5MTk0NTYsInVzZXJJRCI6IjEifQ.Ww85HQzCdhzp_LzJTg8UvxcrXj5eanLyLJDyDNQIG6E"
+    }
+```
+
+Get User by ID
+
+- Endpoint: GET /api/v1/users/{id}
+
+- Description: Retrieves a user's information by their ID.
+
+- Response Example:
+
+```bash
+
+    {
+      "id": 4,
+      "firstName": "ade",
+      "lastName": "surfinia",
+      "email": "me@ade.com",
+      "role": "user",
+      "createdAt": "2024-09-01T20:12:23Z"
+    }
+``` 
+
+List All Products
+
+- Endpoint: GET /api/v1/products
+
+- Description: Retrieves a list of all available products.
+
+- Response Example:
+
+```bash
+
+    [
+      {
+        "id": 1,
+        "name": "Wireless Headphones",
+        "description": "High-quality wireless headphones with noise cancellation.",
+        "image": "https://example.com/images/wireless-headphones.jpg",
+        "price": 59.99,
+        "quantity": 96,
+        "createdAt": "2024-09-01T22:04:50Z"
+      },
+      {
+        "id": 2,
+        "name": "Bluetooth Speaker",
+        "description": "Portable Bluetooth speaker with 360-degree sound and waterproof design.",
+        "image": "https://example.com/images/bluetooth-speaker.jpg",
+        "price": 79.99,
+        "quantity": 44,
+        "createdAt": "2024-09-01T22:09:06Z"
+      }
+    ]
+```
+
+Get Product by ID
+
+- Endpoint: GET /api/v1/products/{id}
+
+- Description: Retrieves details of a specific product by its ID.
+
+- Response Example:
+
+```bash
+
+    {
+      "id": 1,
+      "name": "Wireless Headphones",
+      "description": "High-quality wireless headphones with noise cancellation.",
+      "image": "https://example.com/images/wireless-headphones.jpg",
+      "price": 59.99,
+      "quantity": 100,
+      "createdAt": "2024-09-01T22:04:50Z"
+    }
+```
+
+Checkout Cart
+
+- Endpoint: POST /api/v1/cart/checkout
+
+- Description: Checks out the items in the user's cart. Users need to be authenticated to use this endpoint.
+
+- Payload Example:
+
+```bash
+
+{
+  "items": [
+    {
+      "productID": 1,
+      "quantity": 2
+    },
+    {
+      "productID": 2,
+      "quantity": 3
+    }
+  ]
+}
+```
+
+Response Example:
+
+```bash
+
+{
+  "order_id": 3,
+  "total_price": 359.95
+}
+``` 
+
 ## Running the tests
 
 To run the tests, you can use the following command:
