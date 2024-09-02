@@ -88,6 +88,110 @@ After that, you can run the project with the following command:
 make run
 ```
 
+## Running the tests
+
+To run the tests, you can use the following command:
+
+```bash
+make test
+```
+
+
+### Running the Project with Docker
+#### Step 1: Docker Setup
+
+To use Docker for containerizing the application and the database, follow these steps:
+
+- Ensure you have Docker installed on your machine.
+
+- Create a docker-compose.yml file with the following content:
+
+```bash
+
+version: '3'
+services:
+
+  db:
+    image: mysql:8.0
+    healthcheck:
+      test: "exit 0"
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_DATABASE: ecom
+
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - .:/go/src/api
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: mypassword
+      DB_NAME: ecom
+    links:
+      - db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+```
+Don't forget to change `mypassword` to your database password
+
+Create a Dockerfile in your project root:
+
+
+```bash
+
+    # syntax=docker/dockerfile:1
+
+    # Build the application from source
+    FROM golang:1.22.0 AS build-stage
+      WORKDIR /app
+
+      COPY go.mod go.sum ./
+      RUN go mod download
+
+      COPY . .
+
+      RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/main.go
+
+      # Run the tests in the container
+    FROM build-stage AS run-test-stage
+      RUN go test -v ./...
+
+    # Deploy the application binary into a lean image
+    FROM scratch AS build-release-stage
+      WORKDIR /
+
+      COPY --from=build-stage /api /api
+
+      EXPOSE 8080
+
+      ENTRYPOINT ["/api"]
+``` 
+
+#### Step 2: Running the Docker Containers
+
+To start the application and database containers, use:
+
+```bash
+docker-compose up --build
+```
+
+This command will build and start both the MySQL database and the API service. The application will be accessible at http://localhost:8080.
+
+
+
 ## API Endpoints
 User Registration
 - Endpoint: POST /api/v1/register
@@ -116,6 +220,7 @@ Admin Registration: Include "role": "admin" in the payload.
     }
 ```
 
+
 User Login
 
 - Endpoint: POST /api/v1/login
@@ -142,6 +247,7 @@ json
     }
 ```
 
+
 Get User by ID
 
 - Endpoint: GET /api/v1/users/{id}
@@ -161,6 +267,7 @@ Get User by ID
       "createdAt": "2024-09-01T20:12:23Z"
     }
 ``` 
+
 
 List All Products
 
@@ -194,6 +301,7 @@ List All Products
     ]
 ```
 
+
 Get Product by ID
 
 - Endpoint: GET /api/v1/products/{id}
@@ -214,6 +322,7 @@ Get Product by ID
       "createdAt": "2024-09-01T22:04:50Z"
     }
 ```
+
 
 Checkout Cart
 
@@ -248,11 +357,3 @@ Response Example:
   "total_price": 359.95
 }
 ``` 
-
-## Running the tests
-
-To run the tests, you can use the following command:
-
-```bash
-make test
-```
