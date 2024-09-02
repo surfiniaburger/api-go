@@ -45,11 +45,13 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.store.GetUserByEmail(user.Email)
 	if err != nil {
+		fmt.Println("User retrieval failed:", err)
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
 		return
 	}
 
 	if !auth.ComparePasswords(u.Password, []byte(user.Password)) {
+		fmt.Println("Password mismatch")
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid email or password"))
 		return
 	}
