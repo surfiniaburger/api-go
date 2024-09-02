@@ -1,3 +1,4 @@
+// jwt.go
 package auth
 
 import (
@@ -6,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -20,7 +22,7 @@ const UserKey contextKey = "userID"
 
 func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenString := utils.GetTokenFromRequest(r)
+		tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 
 		token, err := validateJWT(tokenString)
 		if err != nil {
@@ -52,6 +54,13 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 			return
 		}
 
+		// Check if the user is an admin
+		if u.Role != "admin" {
+			log.Printf("user %d does not have admin permissions", userID)
+			permissionDenied(w)
+			return
+		}
+
 		// Add the user to the context
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, UserKey, u.ID)
@@ -79,6 +88,7 @@ func CreateJWT(secret []byte, userID int) (string, error) {
 }
 
 func validateJWT(tokenString string) (*jwt.Token, error) {
+
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

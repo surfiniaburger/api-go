@@ -36,24 +36,22 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	u := new(types.User)
-	for rows.Next() {
-		u, err = scanRowsIntoUser(rows)
-		if err != nil {
-			return nil, err
-		}
+	if !rows.Next() { // Check if there are any rows
+		return nil, fmt.Errorf("user not found")
 	}
 
-	if u.ID == 0 {
-		return nil, fmt.Errorf("user not found")
+	u, err := scanRowsIntoUser(rows)
+	if err != nil {
+		return nil, err
 	}
 
 	return u, nil
 }
 
 func (s *Store) GetUserByID(id int) (*types.User, error) {
-	rows, err := s.db.Query("SELECT * FROM users WHERE id = ?", id)
+	rows, err := s.db.Query("SELECT id, firstName, lastName, email, password, role, createdAt FROM users WHERE id = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +80,7 @@ func scanRowsIntoUser(rows *sql.Rows) (*types.User, error) {
 		&user.LastName,
 		&user.Email,
 		&user.Password,
+		&user.Role,
 		&user.CreatedAt,
 	)
 	if err != nil {
