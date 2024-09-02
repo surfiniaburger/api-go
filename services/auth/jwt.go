@@ -20,7 +20,7 @@ type contextKey string
 
 const UserKey contextKey = "userID"
 
-func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.HandlerFunc {
+func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore, requiredRoles ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 
@@ -54,9 +54,10 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 			return
 		}
 
-		// Check if the user is an admin
-		if u.Role != "admin" {
-			log.Printf("user %d does not have admin permissions", userID)
+		// Check if the user has one of the required roles
+		userRole := u.Role
+		if !roleIsAllowed(userRole, requiredRoles) {
+			log.Printf("user %d does not have the required permissions", userID)
 			permissionDenied(w)
 			return
 		}
@@ -69,6 +70,15 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 		// Call the function if the token is valid
 		handlerFunc(w, r)
 	}
+}
+
+func roleIsAllowed(userRole string, requiredRoles []string) bool {
+	for _, role := range requiredRoles {
+		if userRole == role {
+			return true
+		}
+	}
+	return false
 }
 
 func CreateJWT(secret []byte, userID int) (string, error) {
