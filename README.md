@@ -190,6 +190,134 @@ docker-compose up --build
 
 This command will build and start both the MySQL database and the API service. The application will be accessible at http://localhost:8080.
 
+## Deploy to Google Cloud
+To deploy your Go-based e-commerce API to Google Cloud, we'll use Google Kubernetes Engine (GKE) for managing your Docker containers. Here's a step-by-step guide:
+Prerequisites
+
+- Google Cloud Account: Ensure you have a Google Cloud account.
+- Google Cloud SDK: Install the Google Cloud SDK on your local machine. Installation Guide.
+- Docker: Ensure Docker is installed on your machine. Installation Guide.
+- kubectl: Ensure kubectl is installed. You can install it using Google Cloud SDK by running:
+
+```bash
+
+    gcloud components install kubectl
+```
+
+Step 1: Set Up Google Cloud Project
+
+- Create a new project:
+
+```bash
+
+gcloud projects create your-project-id --set-as-default
+``` 
+Replace your-project-id with a unique ID.
+
+Link billing account:
+
+```bash
+
+gcloud beta billing projects link your-project-id --billing-account your-billing-account-id
+``` 
+
+Enable required APIs:
+
+```bash
+
+    gcloud services enable compute.googleapis.com container.googleapis.com containerregistry.googleapis.com
+``` 
+
+Step 2: Containerize Your Application
+
+- Build Docker Image:
+
+```bash
+docker build -t gcr.io/your-project-id/ecom-api:v1 .
+```
+Push Docker Image to Google Container Registry (GCR):
+
+```bash
+    docker push gcr.io/your-project-id/ecom-api:v1
+```
+Step 3: Set Up Google Kubernetes Engine (GKE)
+
+- Create GKE Cluster:
+
+```bash
+
+gcloud container clusters create ecom-cluster --num-nodes=2 --zone=us-central1-a
+```
+Get authentication credentials for the cluster:
+
+```bash
+
+    gcloud container clusters get-credentials ecom-cluster --zone us-central1-a
+```
+
+Step 4: Deploy to Kubernetes
+
+    Create Kubernetes Deployment: Create a deployment.yaml file with the following content:
+
+```bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ecom-api
+  template:
+    metadata:
+      labels:
+        app: ecom-api
+    spec:
+      containers:
+      - name: ecom-api
+        image: gcr.io/your-project-id/ecom-api:v1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "db-service"
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          value: "mypassword"
+        - name: DB_NAME
+          value: "ecom"
+```
+
+Deploy the application:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+Expose the application:
+
+```bash
+    kubectl expose deployment ecom-api --type=LoadBalancer --port 80 --target-port 8080
+```
+
+Step 5: Access Your Application
+
+- Get the external IP:
+
+```bash
+
+    kubectl get services
+```
+- Find the external IP under the EXTERNAL-IP column.
+
+- Test your API: Use the external IP to test your API, e.g., http://EXTERNAL-IP/api/v1/products.
+
+### Additional Considerations
+
+- Database: You can deploy your MySQL database within the same Kubernetes cluster or use Google Cloud SQL.
+- Monitoring and Logging: Set up Google Cloud's operations suite (formerly Stackdriver) for monitoring and logging.
 
 
 ## API Endpoints

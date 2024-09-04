@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ecom-api
+  template:
+    metadata:
+      labels:
+        app: ecom-api
+    spec:
+      containers:
+      - name: ecom-api
+        image: gcr.io/api-go-434501/ecom-api:v1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "db-service"
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          value: "@WockyRocky007"
+        - name: DB_NAME
+          value: "ecom"
