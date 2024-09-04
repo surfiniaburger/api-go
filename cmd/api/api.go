@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/surfiniaburger/api-go/services/cart"
+	"github.com/surfiniaburger/api-go/services/library"
 	"github.com/surfiniaburger/api-go/services/order"
 	"github.com/surfiniaburger/api-go/services/product"
 	"github.com/surfiniaburger/api-go/services/user"
@@ -38,6 +39,10 @@ func (s *APIServer) Run() error {
 	productHandler.RegisterRoutes(subrouter)
 
 	orderStore := order.NewStore(s.db)
+
+	bookStore := library.NewBookStore(s.db)
+	bookHandler := library.NewBookHandler(bookStore, userStore)
+	bookHandler.RegisterRoutes(subrouter)
 
 	cartHandler := cart.NewHandler(productStore, orderStore, userStore)
 	cartHandler.RegisterRoutes(subrouter)

@@ -63,6 +63,13 @@ type ProductStore interface {
 	UpdateProduct(Product) error
 }
 
+type BookStore interface {
+	CreateBook(book CreateBookPayload) error
+	GetBookByID(bookID string) (*Book, error)
+	UpdateBook(bookID string, book UpdateBookPayload) error // Add this line
+	// Add more methods as needed
+}
+
 type OrderStore interface {
 	CreateOrder(Order) (int, error)
 	CreateOrderItem(OrderItem) error
@@ -90,4 +97,29 @@ type LoginUserPayload struct {
 
 type CartCheckoutPayload struct {
 	Items []CartCheckoutItem `json:"items" validate:"required"`
+}
+
+type CreateBookPayload struct {
+	BookID        string  `json:"bookid" validate:"required"`
+	Title         string  `json:"title" validate:"required"`
+	Author        string  `json:"author" validate:"required"`
+	Genre         string  `json:"genre" validate:"required"`
+	File          []byte  `json:"file" validate:"required"`
+	AverageRating float32 `json:"average_rating" validate:"required"`
+}
+
+type Book struct {
+	BookID        string  `json:"bookid"`
+	Title         string  `json:"title"`
+	Author        string  `json:"author"`
+	Genre         string  `json:"genre"`
+	File          []byte  `json:"file"`
+	AverageRating float32 `json:"average_rating"`
+}
+
+type UpdateBookPayload struct {
+	Title  string `json:"title" validate:"required"`
+	Author string `json:"author" validate:"required"`
+	Genre  string `json:"genre" validate:"required"`
+	File   []byte `json:"file" validate:"required"`
 }
