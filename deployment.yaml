@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ecom-api
-        image: gcr.io/api-go-434501/ecom-api:v1
+        image: gcr.io/my_prject/ecom-api:v1
         ports:
         - containerPort: 8080
         env:
