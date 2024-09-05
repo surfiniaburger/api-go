@@ -63,6 +63,16 @@ type ProductStore interface {
 	UpdateProduct(Product) error
 }
 
+type BookStore interface {
+	CreateBook(book CreateBookPayload) error
+	GetBookByID(bookID string) (*Book, error) // Ensure it's string
+	UpdateBook(bookID string, book UpdateBookPayload) error
+	DeleteBook(bookID string) error
+	GetAllBooks() ([]*Book, error)
+	SearchBooks(searchTerm string) ([]Book, error)
+	// Add more methods as needed
+}
+
 type OrderStore interface {
 	CreateOrder(Order) (int, error)
 	CreateOrderItem(OrderItem) error
@@ -90,4 +100,39 @@ type LoginUserPayload struct {
 
 type CartCheckoutPayload struct {
 	Items []CartCheckoutItem `json:"items" validate:"required"`
+}
+
+type CreateBookPayload struct {
+	BookID        string   `json:"bookId" validate:"required"`
+	Title         string   `json:"title" validate:"required"`
+	Author        string   `json:"author" validate:"required"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category" validate:"required"`
+	ISBN          string   `json:"isbn"`
+	PublishedDate string   `json:"publishedDate"`
+	Tags          []string `json:"tags"`
+	FileUrl       string   `json:"fileUrl"`
+}
+
+type Book struct {
+	BookID        string   `json:"bookId"`
+	Title         string   `json:"title"`
+	Author        string   `json:"author"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category"`
+	ISBN          string   `json:"isbn"`
+	PublishedDate string   `json:"publishedDate"`
+	Tags          []string `json:"tags"`
+	FileUrl       string   `json:"fileUrl"`
+}
+
+type UpdateBookPayload struct {
+	Title         string   `json:"title" validate:"required"`
+	Author        string   `json:"author" validate:"required"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category" validate:"required"`
+	ISBN          string   `json:"isbn"`
+	PublishedDate string   `json:"publishedDate"`
+	Tags          []string `json:"tags"`
+	FileUrl       string   `json:"fileUrl"`
 }
