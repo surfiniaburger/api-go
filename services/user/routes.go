@@ -110,7 +110,13 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	// Respond with success status
+	response := map[string]string{
+		"status":  "success",
+		"message": "User registered successfully",
+	}
+
+	utils.WriteJSON(w, http.StatusCreated, response)
 }
 
 func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
