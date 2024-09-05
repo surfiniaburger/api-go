@@ -65,8 +65,11 @@ type ProductStore interface {
 
 type BookStore interface {
 	CreateBook(book CreateBookPayload) error
-	GetBookByID(bookID string) (*Book, error)
-	UpdateBook(bookID string, book UpdateBookPayload) error // Add this line
+	GetBookByID(bookID string) (*Book, error) // Ensure it's string
+	UpdateBook(bookID string, book UpdateBookPayload) error
+	DeleteBook(bookID string) error
+	GetAllBooks() ([]*Book, error)
+	SearchBooks(searchTerm string) ([]Book, error)
 	// Add more methods as needed
 }
 
@@ -100,26 +103,36 @@ type CartCheckoutPayload struct {
 }
 
 type CreateBookPayload struct {
-	BookID        string  `json:"bookid" validate:"required"`
-	Title         string  `json:"title" validate:"required"`
-	Author        string  `json:"author" validate:"required"`
-	Genre         string  `json:"genre" validate:"required"`
-	File          []byte  `json:"file" validate:"required"`
-	AverageRating float32 `json:"average_rating" validate:"required"`
+	BookID        string   `json:"bookId" validate:"required"`
+	Title         string   `json:"title" validate:"required"`
+	Author        string   `json:"author" validate:"required"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category" validate:"required"`
+	ISBN          string   `json:"isbn"`
+	PublishedDate string   `json:"publishedDate"`
+	Tags          []string `json:"tags"`
+	FileUrl       string   `json:"fileUrl"`
 }
 
 type Book struct {
-	BookID        string  `json:"bookid"`
-	Title         string  `json:"title"`
-	Author        string  `json:"author"`
-	Genre         string  `json:"genre"`
-	File          []byte  `json:"file"`
-	AverageRating float32 `json:"average_rating"`
+	BookID        string   `json:"bookId"`
+	Title         string   `json:"title"`
+	Author        string   `json:"author"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category"`
+	ISBN          string   `json:"isbn"`
+	PublishedDate string   `json:"publishedDate"`
+	Tags          []string `json:"tags"`
+	FileUrl       string   `json:"fileUrl"`
 }
 
 type UpdateBookPayload struct {
-	Title  string `json:"title" validate:"required"`
-	Author string `json:"author" validate:"required"`
-	Genre  string `json:"genre" validate:"required"`
-	File   []byte `json:"file" validate:"required"`
+	Title         string   `json:"title" validate:"required"`
+	Author        string   `json:"author" validate:"required"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category" validate:"required"`
+	ISBN          string   `json:"isbn"`
+	PublishedDate string   `json:"publishedDate"`
+	Tags          []string `json:"tags"`
+	FileUrl       string   `json:"fileUrl"`
 }
