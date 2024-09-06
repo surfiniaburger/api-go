@@ -1,5 +1,8 @@
 ## Book keeping REST API in Go 
 
+### Description
+ library API project is a Go-based application designed to manage a digital library. It supports book creation, updates, deletion, and retrieval with JWT authentication for both users and admins. The API allows users to search books, post reviews, view reviews, and add books to their favorites list. Admins can manage the library by adding or removing books and reviews. The project also integrates Elasticsearch for enhanced book search functionality and uses MySQL as the primary database, with routes built using the Gorilla Mux router.
+
 ### Installation
 
 Open a PowerShell terminal (version 5.1 or later) and from the PS C:\> prompt, run: 
