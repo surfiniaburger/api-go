@@ -1,4 +1,4 @@
-## E-commerce REST API in Go 
+## Book keeping REST API in Go 
 
 ### Installation
 

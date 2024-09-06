@@ -40,7 +40,10 @@ func (s *APIServer) Run() error {
 
 	orderStore := order.NewStore(s.db)
 
-	bookStore := library.NewBookStore(s.db)
+	bookStore, err := library.NewBookStore(s.db)
+	if err != nil {
+		log.Fatalf("Failed to create BookStore: %v", err)
+	}
 	bookHandler := library.NewBookHandler(bookStore, userStore)
 	bookHandler.RegisterRoutes(subrouter)
 

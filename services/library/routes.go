@@ -34,6 +34,7 @@ func (h *BookHandler) RegisterRoutes(router *mux.Router) {
 	// Route for users to get a specific book by bookid
 	router.HandleFunc("/library/{bookid}", h.handleGetBookByID).Methods(http.MethodGet)
 
+	// Search the books in the library
 	router.HandleFunc("/library/search", h.handleSearchBooks).Methods(http.MethodGet)
 
 	// Route for users to post a review on a book

@@ -1,19 +1,31 @@
 package library
 
 import (
+	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/surfiniaburger/api-go/types"
 )
 
 type BookStore struct {
-	db *sql.DB
+	db       *sql.DB
+	esClient *elasticsearch.Client
 }
 
-func NewBookStore(db *sql.DB) *BookStore {
-	return &BookStore{db: db}
+func NewBookStore(db *sql.DB) (*BookStore, error) {
+	esClient, err := elasticsearch.NewDefaultClient()
+	if err != nil {
+		return nil, fmt.Errorf("error creating Elasticsearch client: %s", err)
+	}
+
+	return &BookStore{
+		db:       db,
+		esClient: esClient,
+	}, nil
 }
 
 func (s *BookStore) CreateBook(book types.CreateBookPayload) error {
@@ -128,40 +140,55 @@ func (s *BookStore) GetAllBooks() ([]*types.Book, error) {
 }
 
 func (s *BookStore) SearchBooks(searchTerm string) ([]types.Book, error) {
-	// SQL query to search books by title, author, or description (you can modify it as needed)
-	query := `
-        SELECT bookid, title, author, description, category, isbn, publishedDate, tags, fileUrl
-        FROM books
-        WHERE title LIKE ? OR author LIKE ? OR description LIKE ? OR tags LIKE ? OR category LIKE ?
-    `
-
-	// Use wildcard matching for search terms
-	searchPattern := fmt.Sprintf("%%%s%%", searchTerm)
-
-	// Execute the query
-	rows, err := s.db.Query(query, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern)
-	if err != nil {
-		return nil, err
+	// Construct the search query
+	searchQuery := map[string]interface{}{
+		"query": map[string]interface{}{
+			"multi_match": map[string]interface{}{
+				"query":  searchTerm,
+				"fields": []string{"title", "author", "description", "tags", "category"},
+			},
+		},
 	}
-	defer rows.Close()
 
+	// Convert the search query to JSON
+	queryBody, err := json.Marshal(searchQuery)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal query: %s", err)
+	}
+
+	// Execute the search query
+	res, err := s.esClient.Search(
+		s.esClient.Search.WithContext(context.Background()),
+		s.esClient.Search.WithIndex("books"), // Specify your index name
+		s.esClient.Search.WithBody(bytes.NewReader(queryBody)),
+		s.esClient.Search.WithTrackTotalHits(true),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute search: %s", err)
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		return nil, fmt.Errorf("error response from Elasticsearch: %s", res.String())
+	}
+
+	var esResponse struct {
+		Hits struct {
+			Hits []struct {
+				Source types.Book `json:"_source"`
+			} `json:"hits"`
+		} `json:"hits"`
+	}
+
+	// Parse the response body
+	if err := json.NewDecoder(res.Body).Decode(&esResponse); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %s", err)
+	}
+
+	// Extract books from the response
 	var books []types.Book
-
-	for rows.Next() {
-		var book types.Book
-		var tags []byte // Store the raw JSON as []byte
-
-		// Scan each row
-		if err := rows.Scan(&book.BookID, &book.Title, &book.Author, &book.Description, &book.Category, &book.ISBN, &book.PublishedDate, &tags, &book.FileUrl); err != nil {
-			return nil, err
-		}
-
-		// Decode tags JSON
-		if err := json.Unmarshal(tags, &book.Tags); err != nil {
-			return nil, err
-		}
-
-		books = append(books, book)
+	for _, hit := range esResponse.Hits.Hits {
+		books = append(books, hit.Source)
 	}
 
 	return books, nil
