@@ -166,3 +166,55 @@ func (s *BookStore) SearchBooks(searchTerm string) ([]types.Book, error) {
 
 	return books, nil
 }
+
+// Post a review for a book
+func (s *BookStore) PostReview(userID, bookID string, review types.ReviewPayload) error {
+	_, err := s.db.Exec(`
+        INSERT INTO reviews (userid, bookid, rating, comment, createdAt) 
+        VALUES (?, ?, ?, ?, NOW())`,
+		userID, bookID, review.Rating, review.Comment)
+	return err
+}
+
+// Get reviews for a book
+func (s *BookStore) GetReviews(bookID string) ([]types.Review, error) {
+	rows, err := s.db.Query(`
+        SELECT reviewid, userid, bookid, rating, comment, createdAt 
+        FROM reviews WHERE bookid = ?`, bookID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	reviews := []types.Review{}
+	for rows.Next() {
+		var review types.Review
+		if err := rows.Scan(&review.ReviewID, &review.UserID, &review.BookID, &review.Rating, &review.Comment, &review.CreatedAt); err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, review)
+	}
+
+	return reviews, nil
+}
+
+// Delete a user review
+func (s *BookStore) DeleteUserReview(userID, reviewID string) error {
+	_, err := s.db.Exec(`
+        DELETE FROM reviews WHERE reviewid = ? AND userid = ?`, reviewID, userID)
+	return err
+}
+
+// Admin deletes a review
+func (s *BookStore) DeleteReview(reviewID string) error {
+	_, err := s.db.Exec(`DELETE FROM reviews WHERE reviewid = ?`, reviewID)
+	return err
+}
+
+// Add a book to user's favorites list
+func (s *BookStore) AddToFavorites(userID, bookID string) error {
+	_, err := s.db.Exec(`
+        INSERT INTO favorites (userid, bookid, createdAt) 
+        VALUES (?, ?, NOW())`, userID, bookID)
+	return err
+}

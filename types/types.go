@@ -70,7 +70,15 @@ type BookStore interface {
 	DeleteBook(bookID string) error
 	GetAllBooks() ([]*Book, error)
 	SearchBooks(searchTerm string) ([]Book, error)
-	// Add more methods as needed
+
+	// Methods for handling reviews
+	PostReview(userID, bookID string, review ReviewPayload) error
+	GetReviews(bookID string) ([]Review, error)
+	DeleteUserReview(userID, reviewID string) error
+	DeleteReview(reviewID string) error // Admin delete
+
+	// Methods for handling favorites
+	AddToFavorites(userID, bookID string) error
 }
 
 type OrderStore interface {
@@ -135,4 +143,22 @@ type UpdateBookPayload struct {
 	PublishedDate string   `json:"publishedDate"`
 	Tags          []string `json:"tags"`
 	FileUrl       string   `json:"fileUrl"`
+}
+
+type ReviewPayload struct {
+	Rating  int    `json:"rating" validate:"required,min=1,max=5"`
+	Comment string `json:"comment" validate:"required"`
+}
+
+type Review struct {
+	ReviewID  string `json:"reviewid"`
+	UserID    string `json:"userid"`
+	BookID    string `json:"bookid"`
+	Rating    int    `json:"rating"`
+	Comment   string `json:"comment"`
+	CreatedAt string `json:"createdAt"`
+}
+
+type FavoritePayload struct {
+	BookID string `json:"bookid" validate:"required"`
 }
