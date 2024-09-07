@@ -1,6 +1,6 @@
-CREATE TABLE reviews (
-    reviewId INT PRIMARY KEY AUTO_INCREMENT,
-    userId INT UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS reviews (
+    reviewId SERIAL PRIMARY KEY,
+    userId INT NOT NULL,
     bookId INT NOT NULL,
     rating INT CHECK (rating >= 1 AND rating <= 5), 
     comment TEXT,
@@ -11,10 +11,9 @@ CREATE TABLE reviews (
 
 
 
-
-CREATE TABLE favorites (
-    favoriteId INT PRIMARY KEY AUTO_INCREMENT,
-    userId INT UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS favorites (
+    favoriteId SERIAL PRIMARY KEY,
+    userId INT NOT NULL,
     bookId INT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id),

@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS books (
-    bookId INT PRIMARY KEY AUTO_INCREMENT,
+    bookId SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
     description TEXT,
     category VARCHAR(100) NOT NULL,
     isbn VARCHAR(20),
     publishedDate DATE,
-    tags JSON,
+    tags JSONB,
     fileUrl VARCHAR(255)
 );

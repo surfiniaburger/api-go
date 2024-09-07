@@ -4,6 +4,7 @@ package configloader
 import (
     "os"
     "strconv"
+	"log"
 
     "github.com/joho/godotenv"
 )
@@ -18,7 +19,10 @@ type Config struct {
 
 // Make this function public by renaming it to InitConfig
 func InitConfig() Config {
-    godotenv.Load()
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatalf("Error loading .env file: %v", err)
+    }
 
     // Determine which DB URL to use: external for local, internal for Render
     dbURL := getEnv("DB_URL_EXTERNAL", "")

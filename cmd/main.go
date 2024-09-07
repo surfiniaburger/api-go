@@ -16,7 +16,7 @@ func main() {
 	cfg := configs.Envs
 
 	// Initialize PostgreSQL connection
-	db, err := db.NewPostgresStorage(cfg.DBURL)
+	db, err := db.NewPostgresStorage(cfg) // Pass the entire Config struct
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func main() {
 	initStorage(db)
 
 	// Start the API server
-	server := api.NewAPIServer(fmt.Sprintf(":%s", configs.Envs.Port), db)
+	server := api.NewAPIServer(fmt.Sprintf(":%s", cfg.Port), db)
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
 	}

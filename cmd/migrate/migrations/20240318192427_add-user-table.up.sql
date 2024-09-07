@@ -1,12 +1,11 @@
+CREATE TYPE user_role AS ENUM ('user', 'admin');
+
 CREATE TABLE IF NOT EXISTS users (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `firstName` VARCHAR(255) NOT NULL,
-  `lastName` VARCHAR(255) NOT NULL,
-  `email` VARCHAR(255) NOT NULL,
-  `password` VARCHAR(255) NOT NULL,
-  `role` ENUM('user', 'admin') NOT NULL DEFAULT 'user',
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  
-  PRIMARY KEY (id),
-  UNIQUE KEY (email)
+  id SERIAL PRIMARY KEY,
+  firstName VARCHAR(255) NOT NULL,
+  lastName VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role user_role NOT NULL DEFAULT 'user',
+  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
