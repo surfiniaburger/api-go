@@ -4,14 +4,23 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v4/stdlib" // PostgreSQL driver
+	"github.com/surfiniaburger/api-go/configloader" // Use configloader instead of configs
 )
 
-func NewMySQLStorage(cfg mysql.Config) (*sql.DB, error) {
-	db, err := sql.Open("mysql", cfg.FormatDSN())
+// NewPostgresStorage initializes a new database connection to PostgreSQL
+func NewPostgresStorage(cfg configloader.Config) (*sql.DB, error) {
+	// Use the DBURL from the config struct
+	db, err := sql.Open("pgx", cfg.DBURL)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
+	// Optionally, you can add a ping to check the connection
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	log.Println("Connected to PostgreSQL database!")
 	return db, nil
 }

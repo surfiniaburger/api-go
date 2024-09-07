@@ -5,30 +5,26 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v4/stdlib" // PostgreSQL driver
 	"github.com/surfiniaburger/api-go/cmd/api"
 	"github.com/surfiniaburger/api-go/configs"
 	"github.com/surfiniaburger/api-go/db"
 )
 
 func main() {
-	cfg := mysql.Config{
-		User:                 configs.Envs.DBUser,
-		Passwd:               configs.Envs.DBPassword,
-		Addr:                 configs.Envs.DBAddress,
-		DBName:               configs.Envs.DBName,
-		Net:                  "tcp",
-		AllowNativePasswords: true,
-		ParseTime:            true,
-	}
+	// Load configuration
+	cfg := configs.Envs
 
-	db, err := db.NewMySQLStorage(cfg)
+	// Initialize PostgreSQL connection
+	db, err := db.NewPostgresStorage(cfg.DBURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Initialize and verify the DB connection
 	initStorage(db)
 
+	// Start the API server
 	server := api.NewAPIServer(fmt.Sprintf(":%s", configs.Envs.Port), db)
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
@@ -36,10 +32,12 @@ func main() {
 }
 
 func initStorage(db *sql.DB) {
+	// Test the connection with Ping
 	err := db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("DB: Successfully connected!")
+	log.Println("DB: Successfully connected to PostgreSQL!")
 }
+
